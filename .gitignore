@@ -1,0 +1,22 @@
+# Build output
+build/
+xcode-build/
+*.dSYM/
+
+# CMake generated
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+
+# Stale nested CMake/Xcode tree (has its own .git, tracks only build output)
+cpp-game/
+
+# macOS
+.DS_Store
+
+# Outdated design PDFs — current design lives in design/*.md
+*.pdf
+
+# Internal: mentor role instructions, not for publication
+design/AI_MENTOR_ROLE.md
