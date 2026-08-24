@@ -19,6 +19,14 @@ namespace CQ::Render
   
   FontManager::~FontManager()
   {
+    // Close every font we handed out BEFORE shutting down SDL_ttf.
+    // TTF_Quit() with fonts still open leaks them and is not safe.
+    for (TTF_Font* font : m_fonts)
+    {
+      TTF_CloseFont(font);
+    }
+    m_fonts.clear();
+    
     TTF_Quit();
     std::cout << "SDL_ttf shut down successfully!" << std::endl;
   }
@@ -39,6 +47,8 @@ namespace CQ::Render
       std::cerr << "TTF_Error: " << TTF_GetError() << std::endl;
       return nullptr;
     }
+    
+    m_fonts.push_back(font);  // take ownership
     
     std::cout << "Font loaded successfully: " << filepath_
     << " (size: " << pointSize_ << ")" << std::endl;
