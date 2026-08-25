@@ -28,6 +28,7 @@ namespace CQ::Game {
   , m_running(true)
   {
     m_font = m_fontManager.loadFont(Fonts::MENLO, 24);
+    m_mapFont = m_fontManager.loadFont(Fonts::MENLO, 12);
   }
   
   void Game::run()
@@ -108,7 +109,7 @@ namespace CQ::Game {
     m_sdlRenderer.clear(Colors::BLACK);
     
     // Draw the map
-    m_map.display(m_sdlRenderer, m_font, m_player.getPosition());
+    m_map.display(m_sdlRenderer, m_mapFont, m_player.getPosition());
     
     // Present to screen
     m_sdlRenderer.present();

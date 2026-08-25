@@ -16,6 +16,8 @@ namespace CQ::Map
   class Map
   {
   public:
+    Map();
+    
     void display(Render::SDLRenderer& renderer, TTF_Font* font, const Data::Position& playerPos);
     
   private:

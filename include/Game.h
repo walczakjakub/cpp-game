@@ -36,7 +36,8 @@ namespace CQ::Game
   private:
     Render::SDLRenderer m_sdlRenderer;
     Render::FontManager m_fontManager;
-    TTF_Font* m_font;
+    TTF_Font* m_font;     // 24pt - menus and body text
+    TTF_Font* m_mapFont;  // 12pt - room labels, which must fit a 100px cell
     
     State::GameState m_state;
     Data::Player m_player;
