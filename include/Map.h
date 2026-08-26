@@ -20,6 +20,8 @@ namespace CQ::Map
     
     void display(Render::SDLRenderer& renderer, TTF_Font* font, const Data::Position& playerPos);
     
+    void generate();
+    
   private:
     std::array<std::array<Room  , 4>, 4> m_rooms;
   };

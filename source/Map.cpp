@@ -1,7 +1,13 @@
 #include "Map.h"
 #include "colors.h"
+
 #include <SDL.h>
 #include <SDL_ttf.h>
+
+#include <array>
+#include <algorithm>
+#include <random>
+#include <utility>
 
 namespace Render = CQ::Render;
 namespace Data = CQ::Data;
@@ -9,26 +15,75 @@ namespace Colors = CQ::Colors;
 
 namespace CQ::Map
 {
-  // TEMPORARY placeholder layout: the 16 room types laid out in enum order,
-  // row-major, all marked discovered so every label is visible on screen.
-  //
-  // Phase 4's generate() replaces this with a randomized layout (parking lot
-  // in one of the four corners) and sets discovered = false so undiscovered
-  // rooms render as "?" the way the design calls for.
   Map::Map()
   {
-    int roomIndex = 0;
+    generate();
+  }
+  
+  void Map::generate()
+  {
+    std::array<RoomType, 16> rooms
+    {
+      RoomType::PARKING_LOT,
+      RoomType::PLAYER_OFFICE,
+      RoomType::BOSS_OFFICE,
+      RoomType::BREAK_ROOM,
+      RoomType::MALE_RESTROOM,
+      RoomType::FEMALE_RESTROOM,
+      RoomType::CAFETERIA,
+      RoomType::ARCHIVES,
+      RoomType::COPY_ROOM,
+      RoomType::IT_ROOM,
+      RoomType::HR,
+      RoomType::EARL_OFFICE,
+      RoomType::EUGENE_OFFICE,
+      RoomType::MILDRED_OFFICE,
+      RoomType::MURIEL_OFFICE,
+      RoomType::DAKOTA_OFFICE
+    };
     
+    // randomize the order of rooms
+    std::random_device random_device;
+    std::mt19937 engine(random_device());
+    
+    std::shuffle(rooms.begin(), rooms.end(), engine);
+    
+    int roomIndex {0};
+    Data::Position parkingLotPosition;
     for (int row = 0; row < 4; ++row)
     {
       for (int col = 0; col < 4; ++col)
       {
-        m_rooms[row][col].type = static_cast<RoomType>(roomIndex);
+        m_rooms[row][col].type = rooms[roomIndex];
+        // TODO: change to false after debug and write logic to set office as the only true one
         m_rooms[row][col].discovered = true;
+        
+        if (rooms[roomIndex] == RoomType::PARKING_LOT)
+        {
+          parkingLotPosition = {row, col};
+        }
+        
         ++roomIndex;
       }
     }
-  }
+    
+    // calculate random corner for parking lot
+    std::array<Data::Position, 4> corners
+    {
+      Data::Position{0, 0}, // top left
+      Data::Position{0, 3}, // top right
+      Data::Position{3, 0}, // bottom left
+      Data::Position{3, 3} // bottom right
+    };
+    
+    std::uniform_int_distribution<int> distribution(0, 3);
+    
+    int randomCornerIndex = distribution(engine);
+    
+    Data::Position randomCornerPosition = corners[randomCornerIndex];
+    
+    std::swap(m_rooms[parkingLotPosition.row][parkingLotPosition.col],               m_rooms[randomCornerPosition.row][randomCornerPosition.col]);
+  } // generate()
   
   void Map::display(Render::SDLRenderer& renderer, TTF_Font* font, const Data::Position& playerPos)
   {
@@ -99,5 +154,6 @@ namespace CQ::Map
       }
     }
   } // display()
+  
 } // namespace
 

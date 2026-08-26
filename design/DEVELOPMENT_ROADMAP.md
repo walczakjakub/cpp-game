@@ -300,11 +300,11 @@ enum class RoomType
     COPY_ROOM,
     IT_ROOM,
     HR,
-    EMPLOYEE_1_OFFICE,
-    EMPLOYEE_2_OFFICE,
-    EMPLOYEE_3_OFFICE,
-    EMPLOYEE_4_OFFICE,
-    EMPLOYEE_5_OFFICE
+    EARL_OFFICE,
+    EUGENE_OFFICE,
+    MILDRED_OFFICE,
+    MURIEL_OFFICE,
+    DAKOTA_OFFICE
 };
 
 class Map
@@ -410,11 +410,11 @@ Living, moving NPCs that create opportunities for evidence
 2. IT Guy
 3. Cooking Lady
 4. Janitor (lady)
-5. Employee 1
-6. Employee 2
-7. Employee 3
-8. Employee 4
-9. Employee 5
+5. Earl
+6. Eugene
+7. Mildred
+8. Muriel
+9. Dakota
 
 **Features:**
 ```cpp

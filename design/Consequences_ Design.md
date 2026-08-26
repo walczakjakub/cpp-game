@@ -55,11 +55,11 @@ Color theme is orange/black
 * Copy room  
 * IT room  
 * HR  
-* Employee 1 office  
-* Employee 2 office  
-* Employee 3 office  
-* Employee 4 office  
-* Employee 5 office
+* Earl's office  
+* Eugene's office  
+* Mildred's office  
+* Muriel's office  
+* Dakota's office
 
 ---
 
@@ -140,7 +140,10 @@ The tier of the next discovery depends on what the player already has for that p
 ## **NPCs**
 
 * HR lady  
-* Employee 1–5  
+* Earl, Eugene, Mildred, Muriel, Dakota (the five employees)  
+  * Earl and Eugene are men. Mildred and Muriel are women.  
+  * **Dakota's gender is never revealed.** Unisex name, no pronouns in any dialogue, no gendered description anywhere. The player is given nothing to go on and the game never resolves it. Nobody comments on it — that's the joke.  
+  * **Dakota uses both restrooms.** The male-NPC restriction does not apply to Dakota in either direction — they turn up in the men's and the women's alike. This is never explained, and it is never established whether Dakota is entitled to be in either one. No NPC ever comments on it.  
 * IT guy  
 * Cooking lady  
 * Janitor (lady)  
