@@ -48,46 +48,50 @@ namespace CQ::Map
     
     std::shuffle(rooms.begin(), rooms.end(), engine);
     
+    // move parking lot to a corner
+    std::uniform_int_distribution<int> distribution(0, 3);
+    int randomCornerIndex = distribution(engine);
+    
+    std::array<int, 4> corners
+    {
+      0,  // top left
+      3,  // top right
+      12, // bottom left
+      15  // bottom right
+    };
+    
+    int parkingLotIndex {0};
+    
+    for (int i {0}; i < 16; ++i)
+    {
+      if (rooms[i] == RoomType::PARKING_LOT)
+      {
+        parkingLotIndex = i;
+        break;
+      }
+    }
+    
+    std::swap(rooms[corners[randomCornerIndex]], rooms[parkingLotIndex]);
+    
+    // map rooms to the grid
     int roomIndex {0};
-    Data::Position parkingLotPosition;
+    
     for (int row = 0; row < 4; ++row)
     {
       for (int col = 0; col < 4; ++col)
       {
         m_rooms[row][col].type = rooms[roomIndex];
-        // TODO: change to false after debug and write logic to set office as the only true one
-        m_rooms[row][col].discovered = true;
-        
-        if (rooms[roomIndex] == RoomType::PARKING_LOT)
-        {
-          parkingLotPosition = {row, col};
-        }
-        
-        if (rooms[roomIndex] == RoomType::PLAYER_OFFICE)
+        if (m_rooms[row][col].type == RoomType::PLAYER_OFFICE)
         {
           m_playerOfficePosition = {row, col};
+          m_rooms[row][col].discovered = true;
+        } else {
+          m_rooms[row][col].discovered = false;
         }
         
         ++roomIndex;
       }
     }
-    
-    // calculate random corner for parking lot
-    std::array<Data::Position, 4> corners
-    {
-      Data::Position{0, 0}, // top left
-      Data::Position{0, 3}, // top right
-      Data::Position{3, 0}, // bottom left
-      Data::Position{3, 3} // bottom right
-    };
-    
-    std::uniform_int_distribution<int> distribution(0, 3);
-    
-    int randomCornerIndex = distribution(engine);
-    
-    Data::Position randomCornerPosition = corners[randomCornerIndex];
-    
-    std::swap(m_rooms[parkingLotPosition.row][parkingLotPosition.col],               m_rooms[randomCornerPosition.row][randomCornerPosition.col]);
   } // generate()
   
   void Map::display(Render::SDLRenderer& renderer, TTF_Font* font, const Data::Position& playerPos)
