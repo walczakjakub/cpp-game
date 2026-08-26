@@ -29,6 +29,7 @@ namespace CQ::Game {
   {
     m_font = m_fontManager.loadFont(Fonts::MENLO, 24);
     m_mapFont = m_fontManager.loadFont(Fonts::MENLO, 12);
+    m_player.setPosition(m_map.getPlayerOfficePosition());
   }
   
   void Game::run()
@@ -122,7 +123,31 @@ namespace CQ::Game {
       {
         m_running = false;
       }
-      // TODO: Add keyboard handling for movement later
+      else if (event.type == SDL_KEYDOWN)
+      {
+        // Copy rather than bind a reference, since setPosition() writes to the
+        // very object getPosition() hands back.
+        const Data::Position current { m_player.getPosition() };
+        
+        // setPosition() validates, so a move off the grid is quietly ignored.
+        switch (event.key.keysym.sym)
+        {
+          case SDLK_UP:
+            m_player.setPosition({current.row - 1, current.col});
+            break;
+          case SDLK_DOWN:
+            m_player.setPosition({current.row + 1, current.col});
+            break;
+          case SDLK_LEFT:
+            m_player.setPosition({current.row, current.col - 1});
+            break;
+          case SDLK_RIGHT:
+            m_player.setPosition({current.row, current.col + 1});
+            break;
+          default:
+            break;
+        }
+      }
     }
     
     // Small delay to prevent 100% CPU usage

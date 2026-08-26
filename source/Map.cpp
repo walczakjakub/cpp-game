@@ -63,6 +63,11 @@ namespace CQ::Map
           parkingLotPosition = {row, col};
         }
         
+        if (rooms[roomIndex] == RoomType::PLAYER_OFFICE)
+        {
+          m_playerOfficePosition = {row, col};
+        }
+        
         ++roomIndex;
       }
     }
@@ -154,6 +159,11 @@ namespace CQ::Map
       }
     }
   } // display()
+  
+  const Data::Position& Map::getPlayerOfficePosition() const
+  {
+    return m_playerOfficePosition;
+  }
   
 } // namespace
 
