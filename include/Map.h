@@ -21,6 +21,8 @@ namespace CQ::Map
     
     void display(Render::SDLRenderer& renderer, TTF_Font* font, const Data::Position& playerPos);
     
+    void discoverRoom(const Data::Position& roomPosition);
+    
     const Data::Position& getPlayerOfficePosition() const;
     
   private:

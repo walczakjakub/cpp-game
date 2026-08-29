@@ -164,10 +164,21 @@ namespace CQ::Map
     }
   } // display()
   
+  void Map::discoverRoom(const Data::Position& roomPosition)
+  {
+    if (!roomPosition.isValid())
+    {
+      return;
+    }
+    
+    Room& room = m_rooms[roomPosition.row][roomPosition.col];
+    room.discovered = true;
+  } // discoverRoom()
+  
   const Data::Position& Map::getPlayerOfficePosition() const
   {
     return m_playerOfficePosition;
-  }
+  } // getPlayerOfficePosition
   
 } // namespace
 

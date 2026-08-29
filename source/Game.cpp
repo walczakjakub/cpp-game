@@ -147,6 +147,10 @@ namespace CQ::Game {
           default:
             break;
         }
+        
+        const Data::Position newPosition { m_player.getPosition() };
+        
+        m_map.discoverRoom(newPosition);
       }
     }
     
