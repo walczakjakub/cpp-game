@@ -12,6 +12,8 @@ namespace CQ::Render
     : m_window(nullptr)      // Initialize pointers to nullptr (null = nothing)
     , m_renderer(nullptr)
     , m_initialized(false)   // Start assuming we failed (prove success later)
+    , m_width(width_)
+    , m_height(height_)
   {
     // Step 1: Initialize SDL video subsystem
     // SDL_Init returns 0 on success, negative on failure
@@ -31,7 +33,7 @@ namespace CQ::Render
       SDL_WINDOWPOS_CENTERED,  // Y position
       width_,                   // Width in pixels
       height_,                  // Height in pixels
-      SDL_WINDOW_SHOWN         // Flags
+      SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP  // Flags
     );
     
     // Check if window creation succeeded
@@ -60,6 +62,11 @@ namespace CQ::Render
       SDL_Quit();                  // Clean up SDL
       return;
     }
+    
+    // Fullscreen ignores the requested size, so ask what we actually got.
+    // Output size is in pixels, which is what the draw calls use - on a
+    // Retina display that is larger than the window's size in points.
+    SDL_GetRendererOutputSize(m_renderer, &m_width, &m_height);
     
     // If we got here, everything worked!
     m_initialized = true;

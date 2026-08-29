@@ -27,8 +27,12 @@ namespace CQ::Game {
   , m_currentDay(0)
   , m_running(true)
   {
-    m_font = m_fontManager.loadFont(Fonts::MENLO, 24);
-    m_mapFont = m_fontManager.loadFont(Fonts::MENLO, 12);
+    // Font sizes scale with the screen, otherwise text is unreadably small
+    // on a large or Retina display where drawing happens in raw pixels.
+    const int screenHeight = m_sdlRenderer.getHeight();
+    
+    m_font = m_fontManager.loadFont(Fonts::MENLO, screenHeight / 25);
+    m_mapFont = m_fontManager.loadFont(Fonts::MENLO, screenHeight / 45);
     m_player.setPosition(m_map.getPlayerOfficePosition());
   }
   
@@ -98,6 +102,10 @@ namespace CQ::Game {
         m_state = State::GameState::QUIT;
         break;
       default:
+        // show() returns -1 when the window is closed (or the menu is empty).
+        // Without this the state never changes and run() spins forever, which
+        // in fullscreen leaves no way out but force-quitting.
+        m_state = State::GameState::QUIT;
         break;
     }
     

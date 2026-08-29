@@ -96,13 +96,16 @@ namespace CQ::Map
   
   void Map::display(Render::SDLRenderer& renderer, TTF_Font* font, const Data::Position& playerPos)
   {
-    // Grid settings
-    const int gridWidth = 400;   // 4 cells × 100px
-    const int gridHeight = 400;  // 4 cells × 100px
-    const int windowWidth = 800;
+    // Grid settings, sized from the actual window rather than fixed pixels so
+    // the map fills the screen sensibly whatever resolution we are running at.
+    const int windowWidth = renderer.getWidth();
+    const int windowHeight = renderer.getHeight();
+    
+    // Grid takes 60% of the shorter screen dimension, so it stays square
+    const int cellSize = (std::min(windowWidth, windowHeight) * 6 / 10) / 4;
+    const int gridWidth = cellSize * 4;
     const int gridStartX = (windowWidth - gridWidth) / 2;  // Center horizontally
-    const int gridStartY = 25;   // 25px from top edge
-    const int cellSize = 100;    // Each cell is 100x100 pixels
+    const int gridStartY = windowHeight / 20;              // Small margin from the top
     const int padding = 0;       // No space between cells
     
     // Get the raw SDL_Renderer for drawing rectangles
@@ -179,6 +182,12 @@ namespace CQ::Map
   {
     return m_playerOfficePosition;
   } // getPlayerOfficePosition
+  
+  Room Map::getRoomAt(const Data::Position& roomPosition) const
+  {
+    return m_rooms[roomPosition.row][roomPosition.col];
+  } // getRoomAt()
+
   
 } // namespace
 

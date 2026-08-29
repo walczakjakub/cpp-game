@@ -41,10 +41,24 @@ namespace CQ::Render
       return m_renderer;
     }
     
+    // Actual drawable size in pixels. Not the width/height passed to the
+    // constructor - in fullscreen SDL ignores those and uses the display.
+    int getWidth() const
+    {
+      return m_width;
+    }
+    
+    int getHeight() const
+    {
+      return m_height;
+    }
+    
   private:
     SDL_Window* m_window;       // Pointer to SDL window
     SDL_Renderer* m_renderer;   // Pointer to SDL renderer
     bool m_initialized;         // Track if initialization succeeded
+    int m_width;                // Drawable width in pixels
+    int m_height;               // Drawable height in pixels
   };
   
 } //namespace

@@ -34,6 +34,7 @@ namespace CQ::UI
     
     while (menuActive)
     {
+      renderer_.clear(Colors::BLACK);
       SDL_Event event;
       
       while(SDL_PollEvent(&event))
@@ -63,6 +64,7 @@ namespace CQ::UI
         }
       }
       render(renderer_, font_);
+      renderer_.present();
       SDL_Delay(16);
     }
     return selectedOption;
@@ -76,11 +78,14 @@ namespace CQ::UI
   
   void Menu::render(Render::SDLRenderer& renderer_, TTF_Font* font_) const
   {
-    renderer_.clear(Colors::BLACK);
+    // Sized from the window so the menu stays centred at any resolution
+    const int windowWidth = renderer_.getWidth();
+    const int windowHeight = renderer_.getHeight();
     
-    int startX = 200;
-    int startY = 150;
-    int lineHeight = 50;
+    const int optionWidth = windowWidth / 3;
+    const int lineHeight = windowHeight / 12;
+    const int startX = (windowWidth - optionWidth) / 2;
+    const int startY = windowHeight / 3;
     
     for (size_t i = 0; i < m_options.size(); ++i)
     {
@@ -93,7 +98,7 @@ namespace CQ::UI
         SDL_Rect backgroundRect;
         backgroundRect.x = startX - 10;
         backgroundRect.y = y - 5;
-        backgroundRect.w = 400;
+        backgroundRect.w = optionWidth;
         backgroundRect.h = lineHeight - 10;
         
         SDL_Renderer* sdlRenderer = renderer_.getRenderer();
@@ -125,7 +130,6 @@ namespace CQ::UI
         );
       }
     }
-    renderer_.present();
   }
   
   void Menu::moveSelection(int direction_)

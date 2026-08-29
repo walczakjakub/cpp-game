@@ -25,6 +25,8 @@ namespace CQ::Map
     
     const Data::Position& getPlayerOfficePosition() const;
     
+    Room getRoomAt(const Data::Position& roomPosition) const;
+    
   private:
     std::array<std::array<Room  , 4>, 4> m_rooms;
     

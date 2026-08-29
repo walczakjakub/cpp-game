@@ -37,10 +37,12 @@ namespace CQ::UI
       return m_selectedIndex;
     }
     
+    void render(CQ::Render::SDLRenderer& renderer_, TTF_Font* font_) const;
+    
+    void moveSelection(int direction_);
+    
   private:
     std::vector<Option> m_options;
     int m_selectedIndex;
-    void render(CQ::Render::SDLRenderer& renderer_, TTF_Font* font_) const;
-    void moveSelection(int direction_);
   };
 } // namespace
