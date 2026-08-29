@@ -32,7 +32,11 @@ namespace CQ::Game {
     const int screenHeight = m_sdlRenderer.getHeight();
     
     m_font = m_fontManager.loadFont(Fonts::MENLO, screenHeight / 25);
-    m_mapFont = m_fontManager.loadFont(Fonts::MENLO, screenHeight / 45);
+    // Map labels are sized from the grid cell they have to fit inside, not the
+    // screen, so they stay in proportion if the map layout changes.
+    const int cellSize = Map::Map::cellSizeFor(m_sdlRenderer.getWidth(), screenHeight);
+    
+    m_mapFont = m_fontManager.loadFont(Fonts::MENLO, cellSize / 7);
     m_player.setPosition(m_map.getPlayerOfficePosition());
   }
   
@@ -72,9 +76,9 @@ namespace CQ::Game {
   {
     UI::Menu menu { UI::Menu() };
     
-    for (const auto& option : Strings::menuOptions)
+    for (int i = 0; i < static_cast<int>(Strings::menuOptions.size()); ++i)
     {
-      menu.addOption(option);
+      menu.addOption(Strings::menuOptions[i], i);
     }
     
     int selectedOption { menu.show(m_sdlRenderer, m_font) };

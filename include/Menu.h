@@ -18,15 +18,16 @@ namespace CQ::UI
     struct Option
     {
       std::string text;
+      int id;
       
       //constructor
-      Option(const std::string& text_) : text(text_) {}
+      Option(const std::string& text_, const int id_) : text(text_), id(id_) {}
     };
     
     //constructor
     Menu();
     
-    void addOption(const std::string& text_);
+    void addOption(const std::string& text_, const int id_);
     
     int show(CQ::Render::SDLRenderer& renderer_, TTF_Font* font_);
     
@@ -37,7 +38,9 @@ namespace CQ::UI
       return m_selectedIndex;
     }
     
-    void render(CQ::Render::SDLRenderer& renderer_, TTF_Font* font_) const;
+    // Draws the options inside the given screen region, so the same Menu can
+    // be a centred fullscreen menu or sit in a panel beside the map.
+    void render(CQ::Render::SDLRenderer& renderer_, TTF_Font* font_, const SDL_Rect& area_) const;
     
     void moveSelection(int direction_);
     

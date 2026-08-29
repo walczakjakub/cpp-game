@@ -16,9 +16,9 @@ namespace CQ::UI
   {
   }
 
-  void Menu::addOption(const std::string& text_)
+  void Menu::addOption(const std::string& text_, const int id_)
   {
-    m_options.emplace_back(text_);
+    m_options.emplace_back(text_, id_);
   }
 
   int Menu::show(Render::SDLRenderer& renderer_, TTF_Font* font_)
@@ -63,7 +63,15 @@ namespace CQ::UI
           }
         }
       }
-      render(renderer_, font_);
+      // show() takes over the screen, so centre the options on it
+      const int windowWidth = renderer_.getWidth();
+      const int windowHeight = renderer_.getHeight();
+      const SDL_Rect area { (windowWidth - windowWidth / 3) / 2,
+                            windowHeight / 3,
+                            windowWidth / 3,
+                            windowHeight - windowHeight / 3 };
+      
+      render(renderer_, font_, area);
       renderer_.present();
       SDL_Delay(16);
     }
@@ -76,16 +84,12 @@ namespace CQ::UI
     m_selectedIndex = 0;
   }
   
-  void Menu::render(Render::SDLRenderer& renderer_, TTF_Font* font_) const
+  void Menu::render(Render::SDLRenderer& renderer_, TTF_Font* font_, const SDL_Rect& area_) const
   {
-    // Sized from the window so the menu stays centred at any resolution
-    const int windowWidth = renderer_.getWidth();
-    const int windowHeight = renderer_.getHeight();
-    
-    const int optionWidth = windowWidth / 3;
-    const int lineHeight = windowHeight / 12;
-    const int startX = (windowWidth - optionWidth) / 2;
-    const int startY = windowHeight / 3;
+    const int optionWidth = area_.w;
+    const int lineHeight = renderer_.getHeight() / 12;
+    const int startX = area_.x;
+    const int startY = area_.y;
     
     for (size_t i = 0; i < m_options.size(); ++i)
     {

@@ -94,18 +94,34 @@ namespace CQ::Map
     }
   } // generate()
   
+  int Map::mapAreaWidth(int windowWidth)
+  {
+    return windowWidth * 2 / 3;
+  } // mapAreaWidth()
+  
+  int Map::cellSizeFor(int windowWidth, int windowHeight)
+  {
+    // The map occupies the left two thirds of the screen; the remaining third
+    // is for the movement menu and the rest of the HUD. The grid stays square,
+    // so it is limited by whichever runs out first - that width or the height.
+    const int gridWidth = std::min(mapAreaWidth(windowWidth) * 85 / 100,
+                                   windowHeight * 75 / 100);
+    
+    return gridWidth / 4;
+  } // cellSizeFor()
+  
   void Map::display(Render::SDLRenderer& renderer, TTF_Font* font, const Data::Position& playerPos)
   {
     // Grid settings, sized from the actual window rather than fixed pixels so
-    // the map fills the screen sensibly whatever resolution we are running at.
+    // the map scales sensibly whatever resolution we are running at.
     const int windowWidth = renderer.getWidth();
     const int windowHeight = renderer.getHeight();
     
-    // Grid takes 60% of the shorter screen dimension, so it stays square
-    const int cellSize = (std::min(windowWidth, windowHeight) * 6 / 10) / 4;
-    const int gridWidth = cellSize * 4;
-    const int gridStartX = (windowWidth - gridWidth) / 2;  // Center horizontally
-    const int gridStartY = windowHeight / 20;              // Small margin from the top
+    const int cellSize = cellSizeFor(windowWidth, windowHeight);
+    
+    // Centred within the map area
+    const int gridStartX = (mapAreaWidth(windowWidth) - cellSize * 4) / 2;
+    const int gridStartY = (windowHeight - cellSize * 4) / 2;
     const int padding = 0;       // No space between cells
     
     // Get the raw SDL_Renderer for drawing rectangles
