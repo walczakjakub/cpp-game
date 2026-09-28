@@ -1,6 +1,6 @@
 # 🎮 Consequences: Price of Power - Development Roadmap
 
-**Last Updated:** August 24, 2026 (design review — see Balance Decisions)  
+**Last Updated:** September 28, 2026 (synced with code up to `beb990b`: map, discovery, fullscreen, side panel)  
 **Game Type:** Text-based office RPG with SDL rendering  
 **Language:** C++ with SDL2  
 **Theme:** Orange/Black
@@ -18,7 +18,14 @@ You're a new office employee who was rudely treated by the Main Boss. Your goal:
 
 ---
 
-## ✅ Current Progress (40% Complete)
+## ✅ Current Progress (~50% Complete)
+
+### **Phase 0: Version Control** ✅ COMPLETE
+**Status:** Project root is a git repo with a real `.gitignore` (build output, `cpp-game/`, PDFs, `.DS_Store`).
+The stale `build/`, `xcode-build/`, `cpp-game/`, `main.dSYM/` and `source/main.dSYM/` directories are
+ignored but still on disk — safe to delete whenever.
+
+---
 
 ### **Phase 1: SDL Infrastructure & Menu System** ✅ COMPLETE
 **Status:** Working and tested
@@ -30,11 +37,13 @@ You're a new office employee who was rudely treated by the Main Boss. Your goal:
 - ✅ `colors.h` - Orange/black color scheme
 - ✅ `fonts.h` - Font paths
 - ✅ `strings.h` - Game name and constants
-- ✅ `main.cpp` - Currently running a test menu
+- ✅ `main.cpp` - Creates a `Game` and calls `run()`
 
 **What Works:**
-- SDL window with 800×600 resolution
+- Fullscreen window (`SDL_WINDOW_FULLSCREEN_DESKTOP`), UI and fonts scale to the display
 - Menu rendering with highlighted selection
+- `Menu::render(renderer, font, area)` draws into any screen region, and `moveSelection()` moves the
+  highlight without blocking — the pieces needed for a menu that lives beside the map
 - Arrow key navigation
 - Orange text on black background
 - Proper cleanup (RAII pattern)
@@ -128,6 +137,30 @@ You're a new office employee who was rudely treated by the Main Boss. Your goal:
 
 ---
 
+### **Phase 4: Map System** ✅ COMPLETE
+**Status:** Done across `bf6ea81`…`beb990b`
+
+**Files:**
+- ✅ `Room.h` - `RoomType` enum and room data
+- ✅ `Map.h/cpp` - Generation, discovery, rendering
+
+**What Works:**
+- `Map::generate()` shuffles all 16 rooms, then swaps the parking lot into a random corner
+- Only the player's office starts discovered; `discoverRoom()` reveals rooms as the player walks in
+- Room labels drawn in each cell, `?` for undiscovered rooms
+- Map occupies the left two thirds of the screen; the grid stays square
+- Static helpers `Map::mapAreaWidth()` and `Map::cellSizeFor()` keep layout arithmetic in one place,
+  and the map font is sized from the cell size
+
+**Concepts Learned:**
+- 2D arrays
+- Random number generation (`<random>`)
+- Shuffle-then-fix-up generation (parking lot corner swap)
+- SDL rectangle rendering and grid layout
+- `static` member functions (arithmetic that needs no object)
+
+---
+
 ## ⚖️ Balance Decisions
 
 Settled during design review. Recorded here so we don't re-litigate them later.
@@ -152,26 +185,6 @@ easy, the cheap knob is capping moves per hour. Don't build that on spec.
 ---
 
 ## 🚧 Remaining Work
-
-### **Phase 0: Version Control** ⬅️ DO THIS FIRST
-**Time Estimate:** 10 minutes  
-**Difficulty:** Easy
-
-The `include/`, `source/` and `design/` directories are **not under version control.** The repo at
-`cpp-game/.git` has a single commit tracking `CMakeCache.txt` and a CMake script — none of the actual
-game. One bad `rm` and the project is gone.
-
-**Steps:**
-- `git init` at the project root
-- Write a real `.gitignore` (the current one is empty): `build/`, `xcode-build/`, `*.dSYM/`, `.DS_Store`, `cpp-game/`
-- Commit `CMakeLists.txt`, `include/`, `source/`, `design/`
-- The stale `cpp-game/`, `build/`, `xcode-build/`, `main.dSYM/` and `source/main.dSYM/` directories are all build artifacts and can be deleted
-
-**New Concepts to Learn:**
-- Git basics: `init`, `add`, `commit`, `status`, `log`
-- Why build output never belongs in a repo
-
----
 
 ### **Phase 2b.1: Work Evaluations in Inventory** ⬅️ SMALL GAP
 **Time Estimate:** 15 minutes  
@@ -198,6 +211,7 @@ int  getWorkEvalCount() const;
 
 ### **Phase 3: Game Controller** 🟡 MOSTLY DONE
 **Status:** `Game.h/cpp`, `GameState.h` and the state machine all exist and run. `main.cpp` is rewritten.  
+The main-menu quit bug is fixed (`show()` returning -1 now sets `QUIT`).  
 **Still missing:** SAVE_MENU / LOAD_MENU / PAUSED / GAME_OVER / WIN / RETIREMENT are empty cases. No `startNewGame()` or `endDay()`. `GameState.cpp`'s `openMainMenu()`/`startGame()` are dead stubs nobody calls — delete them.
 
 **Time Estimate:** 20-30 minutes  
@@ -270,78 +284,21 @@ int main()
 
 ---
 
-### **Phase 4: Map System** 🟡 PARTIALLY DONE ⬅️ NEXT!
-**Status:** `Room.h` done. `Map::display()` draws the 4x4 grid and fills the player's cell.  
-**Still missing:** `m_rooms` is never initialized (holds garbage) and `display()` ignores it entirely — no `generate()`, no room names, no `?` for undiscovered rooms.
+### **Phase 5: Movement System** 🟡 PARTIALLY DONE ⬅️ NEXT!
+**Status:** Arrow keys move the player directly (`Game::handlePlaying()`), `setPosition()` silently
+rejects off-grid moves, and each move calls `discoverRoom()`. The right third of the screen is empty,
+reserved for this menu.
+**Still missing:** the directional menu itself, room names / `?` in the option labels, the female
+restroom Easter egg.
 
-**Time Estimate:** 30-40 minutes  
-**Difficulty:** Medium-Hard
-
-**Files to Create:**
-- `Room.h` - Enum of room types
-- `Map.h`
-- `Map.cpp`
-
-**Purpose:**
-4×4 office layout with randomized room placement
-
-**Features:**
-```cpp
-enum class RoomType
-{
-    PARKING_LOT,
-    PLAYER_OFFICE,
-    BOSS_OFFICE,
-    BREAK_ROOM,
-    MALE_RESTROOM,
-    FEMALE_RESTROOM,
-    CAFETERIA,
-    ARCHIVES,
-    COPY_ROOM,
-    IT_ROOM,
-    HR,
-    EARL_OFFICE,
-    EUGENE_OFFICE,
-    MILDRED_OFFICE,
-    MURIEL_OFFICE,
-    DAKOTA_OFFICE
-};
-
-class Map
-{
-    void generate();  // Randomize layout
-    void display(SDLRenderer& renderer, TTF_Font* font, const Position& playerPos);
-    RoomType getRoomAt(const Position& pos);
-    bool isDiscovered(const Position& pos);
-    void discoverRoom(const Position& pos);
-};
-```
-
-**Requirements from Design:**
-- Parking lot always in one of four corners
-- All other rooms randomized
-- Each employee has their own office
-- Track which rooms player has discovered
-- Display using SDL rendering with current player position highlighted
-
-**New Concepts to Learn:**
-- 2D arrays / nested vectors
-- Random number generation (`<random>`)
-- Map generation algorithms
-- SDL rectangle rendering
-- Drawing grids with SDL
-
----
-
-### **Phase 5: Movement System**
-**Time Estimate:** 20 minutes  
+**Time Estimate:** 20-30 minutes  
 **Difficulty:** Easy-Medium
 
 **Purpose:**
 Navigate between rooms with directional menu
 
 **Features:**
-- Movement menu with Up/Down/Left/Right options
+- Movement menu with Up/Down/Left/Right options, drawn in the right-hand panel via `Menu::render()`
 - Show room names for known rooms: "Left (Kitchen)"
 - Show "Left (?)" for undiscovered rooms
 - Female restroom Easter egg:
@@ -349,13 +306,23 @@ Navigate between rooms with directional menu
   - 2nd attempt: "I REALLY shouldn't go in there"  
   - 3rd attempt: Actually enter
 - Movement doesn't cost energy
-- Validate moves (can't go off map)
+- Directions that would leave the map aren't offered at all
+
+**Decisions to make first:**
+- Who owns the arrow keys once the menu exists — the menu highlight, or direct movement?
+- Rebuild the menu every frame or only after a move (and what that does to the selected index)?
+- What the option `id` encodes, and how it turns back into a `Position`
+- Where the restroom attempt counter lives
 
 **Integration:**
-- Uses `Map` to determine valid moves
+- Uses `Map` to determine valid moves and room labels
 - Updates `Player` position
 - Discovers new rooms
 
+**New Concepts to Learn:**
+- Non-blocking UI inside a game loop (vs. the blocking `Menu::show()`)
+- Mapping menu ids to actions
+- Separating input handling from state changes
 ---
 
 ### **Phase 6: Working Mechanic**
@@ -657,10 +624,15 @@ Save game state to disk and load it back
 - Game loop patterns
 - Enum for states
 
-### **Phase 4 (Map):**
-- 2D arrays/vectors
-- Random number generation
-- Algorithms
+### **Phase 4 (Map):** ✅
+- ✅ 2D arrays
+- ✅ Random number generation
+- ✅ Generation algorithms (shuffle, then fix up constraints)
+- ✅ `static` member functions
+
+### **Phase 5 (Movement):**
+- Non-blocking UI in a game loop
+- Mapping menu ids to actions
 
 ### **Phase 7 (NPCs):**
 - Collections management
@@ -682,21 +654,20 @@ Save game state to disk and load it back
 - Error handling
 
 ### **Cross-cutting cleanups (any time):**
-- Ownership: `FontManager::loadFont` returns a raw `TTF_Font*` nobody ever closes, and `~FontManager`
-  calls `TTF_Quit()` with it still open. `SDLRenderer` already gets this right — make `FontManager` match.
+- ✅ ~~Ownership: `FontManager::loadFont` leaked its font~~ — fixed in `11ff937`.
 - Header hygiene: `Map.h` and `Game.h` declare namespace aliases (`Data`, `Render`, `State`, `Map`) at
   **global scope inside headers**, leaking them into every translation unit. Aliases belong in `.cpp` files.
 - `strings.h` uses `const std::string` at namespace scope (internal linkage → one copy per TU) while
   line 8 correctly uses `inline constexpr std::string_view`. Make them consistent.
-- `FontManager operator=(const FontManager&) = delete;` returns by value; should be `FontManager&`.
+- ✅ ~~`FontManager operator=` returned by value~~ — now `FontManager&`.
+- `Inventory::isValidIndex()` hardcodes `<= 4` (see Phase 2b.1).
+- `Menu::getSelectedIndex()` isn't `const`.
 
 ---
 
 ## 🎯 Current Session Goal
 
-1. Get the project under version control
-2. Fix the two known bugs (main-menu quit, font ownership)
-3. Start Phase 4: `Map::generate()` — parking lot in a corner, everything else shuffled
+1. Phase 5: movement menu in the right-hand panel — answer the "Decisions to make first" questions before coding
 
 ---
 
@@ -704,15 +675,15 @@ Save game state to disk and load it back
 
 | Phase | Time | Difficulty | Priority |
 |-------|------|------------|----------|
-| ⬜ 0: Version control | 10min | Easy | **Critical** |
+| ✅ 0: Version control | Done | Easy | Critical |
 | ✅ 1: SDL & Menu | Done | Medium | Critical |
 | ✅ 2a: Position | Done | Easy | Critical |
 | ✅ 2b: Inventory | Done | Easy | Critical |
 | ⬜ 2b.1: Evaluations in Inventory | 15min | Easy | High |
 | ✅ 2c: Player | Done | Medium | Critical |
 | 🟡 3: Game Loop | 15min left | Medium | Critical |
-| 🟡 4: Map | 35min left | Medium-Hard | High |
-| ⬜ 5: Movement | 20min | Easy-Medium | High |
+| ✅ 4: Map | Done | Medium-Hard | High |
+| 🟡 5: Movement | 20-30min left | Easy-Medium | High |
 | ⬜ 6: Working | 20min | Easy | High |
 | ⬜ 7: NPCs | 40min | Medium-Hard | High |
 | ⬜ 8: Evidence | 40min | Hard | High |
@@ -720,18 +691,17 @@ Save game state to disk and load it back
 | ⬜ 9: Boss Fight | 30min | Medium | High |
 | ⬜ 10: Save/Load | 35min | Hard | Medium |
 
-**Total Remaining Time:** ~4-5 hours  
-**Current Completion:** ~40%
+**Total Remaining Time:** ~4 hours  
+**Current Completion:** ~50%
 
 ---
 
 ## 🚀 Next Steps
 
 **Immediate action:**
-1. Put the project under version control (Phase 0) — source is currently untracked
-2. Fix the main-menu quit bug (`Menu::show` returns -1, `handleMainMenu` ignores it → window won't close)
-3. Give `FontManager` real ownership of the font it loads (currently leaked, and `TTF_Quit()` runs with it still open)
-4. Then Phase 4: `Map::generate()`
+1. Phase 5: movement menu in the right-hand panel (room names, `?`, restroom Easter egg)
+2. Phase 2b.1: work evaluations in `Inventory` — a good short-session task, needed before Phase 9
+3. Phase 6: working at your desk — adds the first non-movement option to the same panel menu
 
 ---
 
