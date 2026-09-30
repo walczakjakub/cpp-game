@@ -1,6 +1,14 @@
 #pragma once
 
 namespace CQ::Data {
+  enum class Direction
+  {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
+  };
+  
   struct Position
   {
     int row;
@@ -31,5 +39,20 @@ namespace CQ::Data {
       return row >= 0 && row < 4 && col >= 0 && col < 4;
     }
     
+    Position neighbour(Direction direction_) const
+    {
+      switch (direction_) {
+        case Direction::UP:
+          return Position(row - 1, col);
+        case Direction::DOWN:
+          return Position(row + 1, col);
+        case Direction::LEFT:
+          return Position(row, col - 1);
+        case Direction::RIGHT:
+          return Position(row, col + 1);
+      }
+      
+      return *this;
+    }
   }; // struct Position
 } // namespace

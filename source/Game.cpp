@@ -145,16 +145,16 @@ namespace CQ::Game {
         switch (event.key.keysym.sym)
         {
           case SDLK_UP:
-            m_player.setPosition({current.row - 1, current.col});
+            m_player.setPosition(current.neighbour(Data::Direction::UP));
             break;
           case SDLK_DOWN:
-            m_player.setPosition({current.row + 1, current.col});
+            m_player.setPosition(current.neighbour(Data::Direction::DOWN));
             break;
           case SDLK_LEFT:
-            m_player.setPosition({current.row, current.col - 1});
+            m_player.setPosition(current.neighbour(Data::Direction::LEFT));
             break;
           case SDLK_RIGHT:
-            m_player.setPosition({current.row, current.col + 1});
+            m_player.setPosition(current.neighbour(Data::Direction::RIGHT));
             break;
           default:
             break;
